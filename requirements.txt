@@ -1,0 +1,5 @@
+tensorflow-gpu==2.0.0
+keras==2.3.1
+keras_applications>=1.0.7,<=1.0.8
+image-classifiers==1.0.0
+efficientnet==1.0.0
