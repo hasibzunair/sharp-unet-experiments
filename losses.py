@@ -5,6 +5,7 @@ import tensorflow as tf
 epsilon = 1e-5
 smooth = 1
 
+<<<<<<< HEAD
 
 def dice_coef(y_true, y_pred):
     y_true_f = K.flatten(y_true)
@@ -22,6 +23,8 @@ def dice_coef_loss(y_true, y_pred):
 
 
 ############################# NOT USING NOW
+=======
+>>>>>>> 28707656319fe6795477587a145149ca0bc348f6
 def dsc(y_true, y_pred):
     smooth = 1.
     y_true_f = K.flatten(y_true)
@@ -82,4 +85,8 @@ def tversky_loss(y_true, y_pred):
 def focal_tversky(y_true,y_pred):
     pt_1 = tversky(y_true, y_pred)
     gamma = 0.75
+<<<<<<< HEAD
     return K.pow((1-pt_1), gamma)
+=======
+    return K.pow((1-pt_1), gamma)
+>>>>>>> 28707656319fe6795477587a145149ca0bc348f6
