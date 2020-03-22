@@ -90,7 +90,7 @@ def gauss_unet(input_size = (256,256,1)):
     conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(pool4)
     conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(conv5)
 
-    conv4 = K.lpf(conv4)
+    conv4 = K.lpf(np.array(conv4))
     up6 = concatenate([Conv2DTranspose(256, (2, 2), strides=(2, 2), padding='same')(conv5), conv4], axis=3)
     conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(up6)
     conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv6)
