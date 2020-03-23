@@ -70,7 +70,7 @@ def unet(input_size = (256,256,1)):
 
 
 kernel_size = 3
-sigma = 5
+sigma = 10
 
 
 # Gauss noise or gauss droput?
@@ -95,7 +95,7 @@ def gauss_layer_(in_layer):
     return out
 
 
-def gaussian_unet(input_size = (256,256,1)):
+def g_unet(input_size = (256,256,1)):
     "Unet with LPF in skip connections"
     
     inputs = Input(input_size)
