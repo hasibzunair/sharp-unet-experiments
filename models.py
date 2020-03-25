@@ -14,36 +14,9 @@ import losses as L
 import kernels as Kr
 
 
-kernel_size = 3
-sigma = 10
-
-
-# Gauss noise or gauss droput?
-def get_gauss_weights(layer, kernel_size=3, sigma=5):
-    in_channels = layer.shape[-1]
-    w = Kr.gauss_2D(shape=(kernel_size, kernel_size),sigma=sigma)
-    w = np.expand_dims(w, axis=-1)
-    w = np.repeat(w, in_channels, axis=-1)
-    w = np.expand_dims(w, axis=-1)
-    return w
-
-
-def gauss_layer_(in_layer, train=False):
-    """Not using this now: REFACTOR WITH THIS"""
-     # Get gaussisan weights
-    W = get_gauss_weights(in_layer, kernel_size, sigma) 
-    # Gauss layer
-    gl = DepthwiseConv2D(kernel_size, use_bias=False, padding='same')
-    # Pass input to gauss layer
-    out = gl(in_layer)
-    gl.set_weights([W])
-    gl.trainable = train
-    return out
-
-
 
 # From https://github.com/jocicmarko/ultrasound-nerve-segmentation/blob/master/train.py
-def unet(input_size = (256,256,1), skip_train=None):
+def unet(input_size = (256,256,1)):
     "Baseline Unet"
     
     inputs = Input(input_size)
@@ -96,8 +69,33 @@ def unet(input_size = (256,256,1), skip_train=None):
 
 
 
+kernel_size = 3
+sigma = 10
 
-def g_unet(input_size = (256,256,1), skip_train=False):
+
+# Gauss noise or gauss droput?
+def get_gauss_weights(layer, kernel_size=3, sigma=5):
+    in_channels = layer.shape[-1]
+    w = Kr.gauss_2D(shape=(kernel_size, kernel_size),sigma=sigma)
+    w = np.expand_dims(w, axis=-1)
+    w = np.repeat(w, in_channels, axis=-1)
+    w = np.expand_dims(w, axis=-1)
+    return w
+
+
+def gauss_layer_(in_layer):
+     # Get gaussisan weights
+    W = get_gauss_weights(in_layer, kernel_size, sigma) 
+    # Gauss layer
+    gl = DepthwiseConv2D(kernel_size, use_bias=False, padding='same')
+    # Pass input to gauss layer
+    out = gl(in_layer)
+    gl.set_weights([W])
+    gl.trainable = False
+    return out
+
+
+def g_unet(input_size = (256,256,1)):
     "Unet with LPF in skip connections"
     
     inputs = Input(input_size)
@@ -120,63 +118,62 @@ def g_unet(input_size = (256,256,1), skip_train=False):
     conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(pool4)
     conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(conv5)
     
-    ###########################SKIP CONNECTION 1###############################
+    # Increase kernet size to see performance?? 3 now, try 5, 7
+    
     # 1. Get gaussisan weights
     W = get_gauss_weights(conv4, kernel_size, sigma) 
     # 2. Gauss layer
     gauss_layer = DepthwiseConv2D(kernel_size, use_bias=False, padding='same')
     # 3. Pass input to gauss layer
     conv4 = gauss_layer(conv4)
-    # 4. Set gauss filter as layer weights 
+    # 4. Set gauss filter as layer weights dont update
     gauss_layer.set_weights([W])
-    # 5. Train or not?
-    gauss_layer.trainable = skip_train 
-    ############################################################################
+    gauss_layer.trainable = False 
+    print(gauss_layer.get_weights()[0].shape)
     
     up6 = concatenate([Conv2DTranspose(256, (2, 2), strides=(2, 2), padding='same')(conv5), conv4], axis=3)
     conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(up6)
     conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv6)
     
     
-    
-    ###########################SKIP CONNECTION 2###############################
     # Get gaussisan weights
     W = get_gauss_weights(conv3, kernel_size, sigma) 
     # Gauss layer
     gauss_layer = DepthwiseConv2D(kernel_size, use_bias=False, padding='same')
     conv3 = gauss_layer(conv3)
     gauss_layer.set_weights([W])
-    gauss_layer.trainable = skip_train
-    ############################################################################
+    gauss_layer.trainable = False
+    #print(gauss_layer.get_weights()[0].shape)
+    
     
     up7 = concatenate([Conv2DTranspose(128, (2, 2), strides=(2, 2), padding='same')(conv6), conv3], axis=3)
     conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(up7)
     conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv7)
 
-    ###########################SKIP CONNECTION 3###############################
+    
     # Get gaussisan weights
     W = get_gauss_weights(conv2, kernel_size, sigma) 
     # Gauss layer
     gauss_layer = DepthwiseConv2D(kernel_size, use_bias=False, padding='same')
     conv2 = gauss_layer(conv2)
     gauss_layer.set_weights([W])
-    gauss_layer.trainable = skip_train
-    ############################################################################
+    gauss_layer.trainable = False
+    #print(gauss_layer.get_weights()[0].shape)
     
     
     up8 = concatenate([Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same')(conv7), conv2], axis=3)
     conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(up8)
     conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv8)
     
-    ###########################SKIP CONNECTION 3###############################
+    
     # Get gaussisan weights
     W = get_gauss_weights(conv1, kernel_size, sigma) 
     # Gauss layer
     gauss_layer = DepthwiseConv2D(kernel_size, use_bias=False, padding='same')
     conv1 = gauss_layer(conv1)
     gauss_layer.set_weights([W])
-    gauss_layer.trainable = skip_train
-    ############################################################################
+    gauss_layer.trainable = False
+    #print(gauss_layer.get_weights()[0].shape)
     
     
     up9 = concatenate([Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same')(conv8), conv1], axis=3)
@@ -187,11 +184,11 @@ def g_unet(input_size = (256,256,1), skip_train=False):
 
     model = Model(inputs=[inputs], outputs=[conv10])
     
-    # Compile model with optim and loss
-    optim = 'adam' 
-    loss_func = 'binary_crossentropy'  
+
+     # Compile model with optim and loss
+    optim = 'adam' # Adam(lr=1e-5)
+    loss_func = 'binary_crossentropy'  # L.dice_coef_loss
     
     model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
 
     return model
-
