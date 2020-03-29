@@ -7,6 +7,7 @@ __pycache__/
 datasets/
 logs/
 
+*.h5
 
 
 # C extensions
