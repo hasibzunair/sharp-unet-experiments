@@ -12,3 +12,28 @@ def gauss_2D(shape=(3,3),sigma=5):
     if sumh != 0:
         h /= sumh
     return h
+
+
+def get_kernel():
+    """
+    From https://setosa.io/ev/image-kernels/
+    """
+    
+    # LPF
+    blur = np.array([[0.0625, 0.125, 0.0625],
+                   [0.125,  0.25, 0.125],
+                   [0.0625, 0.125, 0.0625]])
+    
+    # HPF
+    outline = np.array([[-1, -1, -1],
+                   [-1,  8, -1],
+                   [-1, -1, -1]])
+    
+    
+    sharpen = np.array([[0, -1, 0],
+                   [-1,  5, -1],
+                   [0, -1, 0]])
+    
+    return blur, outline, sharpen
+   
+    

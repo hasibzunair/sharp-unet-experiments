@@ -77,8 +77,16 @@ sigma = 10
 def get_gauss_weights(layer, kernel_size=3, sigma=5):
     # Get number of channels in feature
     in_channels = layer.shape[-1]
+    
+    
     # Compute gaussian filter
-    w = Kr.gauss_2D(shape=(kernel_size, kernel_size),sigma=sigma)
+    #w = Kr.gauss_2D(shape=(kernel_size, kernel_size),sigma=sigma)
+    # Get kernel
+    w_blur, w_outline, w_sharpen = Kr.get_kernel()
+    
+    # Weights according to kernel type
+    w = w_sharpen
+    
     # Change dimension
     w = np.expand_dims(w, axis=-1)
     # Repeat filter by in_channels times to get (H, W, in_channels)
