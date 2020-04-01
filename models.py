@@ -55,13 +55,17 @@ def unet(input_size = (256,256,1)):
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(up9)
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
 
-    conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9)
+    # Binary
+    #conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9) 
+    
+    # Multi
+    conv10 = Conv2D(4, (1, 1), activation='softmax')(conv9) 
 
     model = Model(inputs=[inputs], outputs=[conv10])
 
      # Compile model with optim and loss
-    optim = 'adam' # Adam(lr=1e-5)
-    loss_func = 'binary_crossentropy'  # L.dice_coef_loss
+    optim = 'adam' 
+    loss_func = 'categorical_crossentropy' 
     
     model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
 
@@ -79,13 +83,13 @@ def get_gauss_weights(layer, kernel_size=3, sigma=5):
     in_channels = layer.shape[-1]
     
     
-    # Compute gaussian filter
-    #w = Kr.gauss_2D(shape=(kernel_size, kernel_size),sigma=sigma)
     # Get kernel
+    #w = Kr.gauss_2D(shape=(kernel_size, kernel_size),sigma=sigma)
+    # OR
     w_blur, w_outline, w_sharpen = Kr.get_kernel()
     
     # Weights according to kernel type
-    w = w_sharpen
+    w = w_outline # w_outline aka high pass filter works well!
     
     # Change dimension
     w = np.expand_dims(w, axis=-1)
@@ -173,14 +177,18 @@ def g_unet(input_size = (256,256,1)):
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(up9)
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
 
-    conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9)
-
+    # Binary
+    #conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9) 
+    
+    # Multi
+    conv10 = Conv2D(4, (1, 1), activation='softmax')(conv9) 
+    
     model = Model(inputs=[inputs], outputs=[conv10])
     
 
     # Compile model with optim and loss
-    optim = 'adam' # Adam(lr=1e-5)
-    loss_func = 'binary_crossentropy'  # L.dice_coef_loss
+    optim = 'adam' 
+    loss_func = 'categorical_crossentropy' # binary_crossentropy
     
     model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
 
