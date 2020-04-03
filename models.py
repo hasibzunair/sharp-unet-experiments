@@ -56,17 +56,17 @@ def unet(input_size = (256,256,1)):
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
 
     # Binary segmentation
-    #conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9) 
+    conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9) 
     
     # Multiclass segmentation
-    conv10 = Conv2D(4, (1, 1), activation='softmax')(conv9)
+    #conv10 = Conv2D(4, (1, 1), activation='softmax')(conv9)
 
     model = Model(inputs=[inputs], outputs=[conv10])
 
      # Compile model with optim and loss
     optim = 'adam' 
     # If bin seg, use bin_ce loss
-    loss_func = 'categorical_crossentropy'  # binary_crossentropy
+    loss_func = 'binary_crossentropy'  #  categorical_crossentropy
     
     model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
 
@@ -179,10 +179,10 @@ def g_unet(input_size = (256,256,1)):
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
 
     # Binary segmentation
-    #conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9) 
+    conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9) 
     
     # Multiclass segmentation
-    conv10 = Conv2D(4, (1, 1), activation='softmax')(conv9) 
+    #conv10 = Conv2D(4, (1, 1), activation='softmax')(conv9) 
     
     model = Model(inputs=[inputs], outputs=[conv10])
     
@@ -191,7 +191,7 @@ def g_unet(input_size = (256,256,1)):
     optim = 'adam' 
     
     # If binary seg, use bin_ce loss
-    loss_func = 'categorical_crossentropy' # binary_crossentropy
+    loss_func = 'binary_crossentropy' #  categorical_crossentropy
     
     model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
 
