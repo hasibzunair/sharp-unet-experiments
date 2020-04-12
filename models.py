@@ -9,6 +9,9 @@ from keras.optimizers import *
 from keras.layers import *        
 import tensorflow as tf
 
+
+import segmentation_models as sm
+
 import metrics as M
 import losses as L
 import kernels as Kr
@@ -348,6 +351,40 @@ def g_wide_unet(input_size = (256,256,1)):
     
     model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
 
+    return model
+
+
+
+# UNET and EDGEUNET WITH BACKBONES
+
+def unet_backbone(backbone, input_size):
+    
+    model = sm.Unet(backbone_name=backbone, input_shape=input_size, classes=1, activation='sigmoid', encoder_weights=None)
+    
+    # Compile model with optim and loss
+    optim = 'adam' 
+    
+    # If bin seg, use bce loss, or categorical_crossentropy for multi class
+    loss_func = 'binary_crossentropy'  
+    
+    model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
+    
+    return model
+
+
+
+def edgeunet_backbone(backbone, input_size):
+    
+    model = sm.EdgeUnet(backbone_name=backbone, input_shape=input_size, classes=1, activation='sigmoid', encoder_weights=None)
+    
+    # Compile model with optim and loss
+    optim = 'adam' 
+    
+    # If bin seg, use bce loss, or categorical_crossentropy for multi class
+    loss_func = 'binary_crossentropy'  
+    
+    model.compile(optimizer = optim, loss = loss_func, metrics = [M.jacard, M.dice_coef])
+    
     return model
 
 
