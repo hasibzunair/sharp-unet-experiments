@@ -163,7 +163,7 @@ def wide_unet(input_size = (256,256,1)):
 
 
 
-def g_unet(input_size = (256,256,1)):
+def edgeunet(input_size = (256,256,1)):
     "Unet with HPF layer in skip connections"
     
     inputs = Input(input_size)
@@ -259,7 +259,7 @@ def g_unet(input_size = (256,256,1)):
 
 
 
-def g_wide_unet(input_size = (256,256,1)):
+def wide_edgeunet(input_size = (256,256,1)):
     "Wide Unet with HPF in skip connections"
     
     inputs = Input(input_size)
@@ -357,9 +357,9 @@ def g_wide_unet(input_size = (256,256,1)):
 
 # UNET and EDGEUNET WITH BACKBONES
 
-def unet_backbone(backbone, input_size):
+def unet_backbone(backbone, input_size, encoder_weights=None):
     
-    model = sm.Unet(backbone_name=backbone, input_shape=input_size, classes=1, activation='sigmoid', encoder_weights=None)
+    model = sm.Unet(backbone_name=backbone, input_shape=input_size, classes=1, activation='sigmoid', encoder_weights=encoder_weights)
     
     # Compile model with optim and loss
     optim = 'adam' 
@@ -373,9 +373,9 @@ def unet_backbone(backbone, input_size):
 
 
 
-def edgeunet_backbone(backbone, input_size):
+def edgeunet_backbone(backbone, input_size, encoder_weights=None):
     
-    model = sm.EdgeUnet(backbone_name=backbone, input_shape=input_size, classes=1, activation='sigmoid', encoder_weights=None)
+    model = sm.EdgeUnet(backbone_name=backbone, input_shape=input_size, classes=1, activation='sigmoid', encoder_weights=encoder_weights)
     
     # Compile model with optim and loss
     optim = 'adam' 

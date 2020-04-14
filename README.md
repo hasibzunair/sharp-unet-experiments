@@ -6,10 +6,6 @@ conda install -c conda-forge keras==2.3.1
 conda install -c conda-forge tqdm
 pip install tifffile
 pip install nibabel
+pip install git+https://github.com/qubvel/classification_models.git
 
 ```
-
-* Make conda env
-* pip install tifffile
-* pip install tqdm
-* pip install nibabel
