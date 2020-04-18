@@ -144,6 +144,21 @@ def DecoderTransposeX2Block(filters, stage, use_batchnorm=False):
         x = layers.Activation('relu', name=relu_name)(x)
 
         if skip is not None:
+            
+            #########################################################################################
+            # 1. Get gaussisan weights(1, H, W, channels) 
+            W = get_gauss_weights(skip, kernel_size, sigma) 
+            # 2. Build gauss layer with random weights
+            gauss_layer = DepthwiseConv2D(kernel_size, use_bias=False, padding='same')
+            # 3. Pass input to gauss layer
+            skip = gauss_layer(skip)
+            # 4. Set gauss filtersas layer weights 
+            gauss_layer.set_weights([W])
+            # 5. Dont update weights
+            gauss_layer.trainable = False 
+            #print(gauss_layer.get_weights()[0].shape)
+            #########################################################################################
+            
             x = layers.Concatenate(axis=concat_axis, name=concat_name)([x, skip])
 
         x = Conv3x3BnReLU(filters, use_batchnorm, name=conv_block_name)(x)
